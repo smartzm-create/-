@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>排版与导出 · 漫画工作台</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .wrap{max-width:1320px;margin:0 auto;padding:var(--sp-6) var(--sp-6) var(--sp-16)}
+
+  .subhead{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-5);flex-wrap:wrap}
+  .back{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-13);color:var(--muted);min-height:28px;padding:0 4px}
+  .back:hover{color:var(--text)}
+  .subhead h1{margin:0;font-size:var(--fs-24);font-weight:600;letter-spacing:-.02em}
+  .subhead .badge{margin-left:auto}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:var(--sp-5);align-items:start}
+
+  /* 画布工具条 */
+  .canvas-bar{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-3);flex-wrap:wrap}
+  .page-nav{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-13);color:var(--muted)}
+  .page-nav .pg{color:var(--text);font-weight:600}
+  .zoom{margin-left:auto;display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-12);color:var(--muted)}
+  .zoom button{width:28px;height:28px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;color:var(--muted)}
+
+  /* 漫画页 */
+  .canvas{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-lg);padding:var(--sp-5);display:flex;justify-content:center}
+  .page{
+    width:100%;max-width:520px;aspect-ratio:2/3;background:#fff;
+    box-shadow:var(--shadow-md);border-radius:2px;
+    display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(12,1fr);
+    gap:8px;padding:10px;
+  }
+  .cellp{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:2px;background:#E7ECF5}
+  .cellp svg{width:100%;height:100%;display:block}
+  .cellp .sel-outline{position:absolute;inset:0;border:2px solid var(--accent);pointer-events:none}
+
+  /* 气泡 */
+  .bubble{
+    position:absolute;max-width:70%;
+    background:#fff;border:1.5px solid var(--text);border-radius:14px;
+    padding:6px 10px;font-size:12px;line-height:1.45;color:var(--text);
+    box-shadow:var(--shadow-sm);
+  }
+  .bubble .who{font-weight:700;font-size:12px;color:var(--muted);display:block;margin-bottom:1px}
+  .bubble::after{
+    content:"";position:absolute;width:12px;height:12px;background:#fff;
+    border-right:1.5px solid var(--text);border-bottom:1.5px solid var(--text);
+    transform:rotate(45deg);
+  }
+  .bubble.tail-bl::after{left:16px;bottom:-7px;clip-path:polygon(0 0,100% 0,0 100%);border:none;background:#fff;border-bottom:1.5px solid var(--text);border-left:1.5px solid var(--text);transform:rotate(0);width:10px;height:10px}
+  .bubble.tail-br::after{right:16px;bottom:-7px;clip-path:polygon(0 0,100% 0,100% 100%);border:none;background:#fff;border-bottom:1.5px solid var(--text);border-right:1.5px solid var(--text);transform:rotate(0);width:10px;height:10px}
+  /* 旁白方框 */
+  .bubble.narr{border-radius:2px;background:#F6F6F4;border-color:var(--line-strong);font-size:12px;color:var(--muted)}
+  .bubble.narr::after{display:none}
+  /* 呼喊 */
+  .bubble.shout{border-width:2px;border-radius:18px;font-weight:700;text-transform:none}
+  /* 选中 */
+  .bubble.selected{outline:2px solid var(--accent);outline-offset:2px}
+  .handle{position:absolute;width:8px;height:8px;background:#fff;border:2px solid var(--accent);border-radius:2px}
+  .handle.tl{left:-5px;top:-5px}.handle.tr{right:-5px;top:-5px}
+  .handle.bl{left:-5px;bottom:-5px}.handle.br{right:-5px;bottom:-5px}
+  /* 音效字 */
+  .sfx{
+    position:absolute;font-weight:700;color:var(--text);
+    font-size:26px;letter-spacing:.04em;
+    text-shadow:2px 2px 0 #fff, -1px -1px 0 #fff;
+    transform:rotate(-8deg);
+  }
+
+  @media (max-width:1080px){.layout{grid-template-columns:1fr}.console{position:static}}
+  @media (max-width:640px){.wrap{padding:var(--sp-5) var(--sp-4) var(--sp-12)}.zoom .btn-ghost{display:none}}
+
+  /* 右栏 */
+  .console{position:sticky;top:76px;display:flex;flex-direction:column;gap:var(--sp-4)}
+  .con-block{padding:var(--sp-5)}
+  .con-title{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-4)}
+  .con-title .section-title{font-size:var(--fs-14);font-weight:600}
+  .con-title .badge{margin-left:auto}
+
+  /* 布局模板 */
+  .tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-2)}
+  .tpl{border:1px solid var(--line);border-radius:var(--radius-sm);padding:5px;background:var(--surface);cursor:pointer;transition:border-color var(--dur) var(--ease)}
+  .tpl:hover{border-color:var(--line-strong)}
+  .tpl.on{border-color:var(--accent);background:var(--accent-soft)}
+  .tpl .mini{display:grid;gap:2px;aspect-ratio:2/3}
+  .tpl .mini i{background:var(--surface-3);border-radius:1px;display:block}
+  .tpl.on .mini i{background:#C7D9FB}
+  .tpl .nm{font-size:var(--fs-12);color:var(--muted);text-align:center;margin-top:3px}
+
+  /* 气泡工具 */
+  .row{padding:var(--sp-2) 0}
+  .row .lab{font-size:var(--fs-12);color:var(--muted);margin-bottom:var(--sp-1);display:flex;justify-content:space-between}
+  .row .lab b{color:var(--text);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:24px}
+  .bub-types{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+  .switchrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-2) 0}
+  .switchrow .lab{font-size:var(--fs-13)}
+  .switchrow .lab small{display:block;color:var(--muted);font-size:var(--fs-12);font-weight:400}
+  .switch{position:relative;width:38px;height:22px;border-radius:var(--radius-full);background:var(--primary);flex-shrink:0}
+  .switch::after{content:"";position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:#fff}
+  .switch.off{background:var(--line-strong)}
+  .switch.off::after{left:3px}
+
+  /* 导出 */
+  .exp-opts{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+  .exp{border:1px solid var(--line);border-radius:var(--radius);padding:var(--sp-3);cursor:pointer;transition:border-color var(--dur) var(--ease)}
+  .exp:hover{border-color:var(--line-strong)}
+  .exp.on{border-color:var(--accent);background:var(--accent-soft)}
+  .exp .ic{color:var(--muted);margin-bottom:var(--sp-1)}
+  .exp.on .ic{color:var(--accent)}
+  .exp .t{font-size:var(--fs-13);font-weight:600}
+  .exp .d{font-size:var(--fs-12);color:var(--muted);line-height:1.4}
+  .exp-rows{display:flex;flex-direction:column}
+  .exp-row{display:flex;justify-content:space-between;align-items:center;padding:var(--sp-2) 0;border-bottom:1px solid var(--line);font-size:var(--fs-13)}
+  .exp-row:last-child{border-bottom:none}
+  .exp-row .k{color:var(--muted)}
+  .exp-row .v{font-weight:500}
+  .export-btn{width:100%;justify-content:center;margin-top:var(--sp-3)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">漫</span>漫画工作台</div>
+  <a href="pipeline.html" class="project-pill"><span class="dot"></span>《夜行电车》第 1 话</a>
+  <div class="topbar-spacer"></div>
+  <a href="storyboard.html" class="btn btn-ghost btn-sm">← 分镜</a>
+  <button class="btn btn-primary btn-sm">导出成品</button>
+</header>
+
+<main class="wrap">
+
+  <div class="subhead">
+    <a href="pipeline.html" class="back">← 流水线</a>
+    <h1>排版 · 对话框</h1>
+    <span class="badge badge-doing"><span class="dot"></span>阶段 5 · 第 3 / 8 页</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- 左：画布 -->
+    <section>
+      <div class="canvas-bar">
+        <div class="page-nav">
+          <button class="btn btn-ghost btn-sm">上一页</button>
+          <span><span class="pg">3</span> / 8</span>
+          <button class="btn btn-ghost btn-sm">下一页</button>
+        </div>
+        <div class="zoom">
+          <button aria-label="缩小">−</button><span>100%</span><button aria-label="放大">+</button>
+          <button class="btn btn-ghost btn-sm" style="height:28px">适配</button>
+        </div>
+      </div>
+
+      <div class="canvas">
+        <div class="page">
+
+          <!-- A 全宽顶格 -->
+          <div class="cellp" style="grid-column:1/7;grid-row:1/5">
+            <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="pA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#222A3B"/><stop offset="1" stop-color="#4A5670"/></linearGradient></defs>
+              <rect width="600" height="300" fill="url(#pA)"/>
+              <path d="M0 300 L120 120 L200 300Z" fill="#161C28" opacity=".7"/>
+              <path d="M420 300 L520 140 L600 300Z" fill="#161C28" opacity=".7"/>
+              <rect x="270" y="120" width="60" height="180" rx="6" fill="#9DB0CF" opacity=".35"/>
+              <g stroke="#8FA0BD" stroke-width="2" opacity=".4">
+                <line x1="300" y1="0" x2="300" y2="300"/>
+              </g>
+              <circle cx="300" cy="160" r="16" fill="#C9D4E8" opacity=".5"/>
+            </svg>
+            <div class="bubble narr" style="left:16px;top:16px">隧道里的灯，开始一盏一盏地灭掉。</div>
+          </div>
+
+          <!-- B 左中 -->
+          <div class="cellp" style="grid-column:1/4;grid-row:5/9">
+            <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="pB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6DEEA"/><stop offset="1" stop-color="#AEB9CB"/></linearGradient></defs>
+              <rect width="300" height="300" fill="url(#pB)"/>
+              <rect x="30" y="50" width="240" height="160" rx="4" fill="#C2CCDC"/>
+              <circle cx="150" cy="140" r="30" fill="#5B6B85"/>
+              <path d="M90 300c0-46 26-70 60-70s60 24 60 70z" fill="#5B6B85"/>
+              <rect x="122" y="104" width="56" height="9" rx="4" fill="#3D4960"/>
+            </svg>
+            <div class="bubble tail-br selected" style="left:14px;top:18px">
+              <span class="handle tl"></span><span class="handle tr"></span><span class="handle bl"></span><span class="handle br"></span>
+              <span class="who">林晚</span>谁在那儿？
+            </div>
+          </div>
+
+          <!-- C 右中 -->
+          <div class="cellp" style="grid-column:4/7;grid-row:5/9">
+            <svg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="pC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2DDD2"/><stop offset="1" stop-color="#C6BFAE"/></linearGradient></defs>
+              <rect width="300" height="300" fill="url(#pC)"/>
+              <rect x="20" y="60" width="260" height="180" rx="4" fill="#D4CDBE"/>
+              <circle cx="200" cy="130" r="28" fill="#7A7263"/>
+              <path d="M148 300c0-44 24-66 52-66s52 22 52 66z" fill="#7A7263"/>
+              <rect x="174" y="98" width="52" height="10" rx="5" fill="#4A4438"/>
+            </svg>
+            <div class="bubble tail-bl" style="right:14px;top:16px">
+              <span class="who">沈默</span>别怕，我等这趟车很久了。
+            </div>
+          </div>
+
+          <!-- D 全宽底格 -->
+          <div class="cellp" style="grid-column:1/7;grid-row:9/13">
+            <svg viewBox="0 0 600 220" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="pD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A2130"/><stop offset="1" stop-color="#333D52"/></linearGradient></defs>
+              <rect width="600" height="220" fill="url(#pD)"/>
+              <rect x="0" y="170" width="600" height="50" fill="#10151F"/>
+              <circle cx="200" cy="120" r="24" fill="#0E121B"/>
+              <path d="M156 220c0-38 20-58 44-58s44 20 44 58z" fill="#0E121B"/>
+              <circle cx="400" cy="118" r="24" fill="#0E121B"/>
+              <path d="M356 220c0-38 20-58 44-58s44 20 44 58z" fill="#0E121B"/>
+            </svg>
+            <div class="sfx" style="left:30px;bottom:24px">咔哒</div>
+            <div class="bubble narr" style="right:16px;bottom:16px">下一站——还没有人下车。</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 右：排版工具 + 导出 -->
+    <aside class="console">
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">页面布局</span><span class="badge">8 页</span></div>
+        <div class="tpls">
+          <div class="tpl on"><div class="mini" style="grid-template-columns:1fr 1fr;grid-template-rows:2fr 1fr 1fr"><i style="grid-column:1/3"></i><i></i><i></i><i></i><i></i></div><div class="nm">1 大 4 小</div></div>
+          <div class="tpl"><div class="mini" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr"><i></i><i></i><i></i><i></i></div><div class="nm">四宫格</div></div>
+          <div class="tpl"><div class="mini" style="grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="nm">六分格</div></div>
+          <div class="tpl"><div class="mini" style="grid-template-columns:1fr;grid-template-rows:1fr 1fr"><i></i><i></i></div><div class="nm">上下分</div></div>
+          <div class="tpl"><div class="mini" style="grid-template-columns:1fr 2fr;grid-template-rows:1fr"><i></i><i></i></div><div class="nm">宽窄</div></div>
+          <div class="tpl"><div class="mini" style="grid-template-columns:1fr;grid-template-rows:1fr"><i></i></div><div class="nm">满页</div></div>
+        </div>
+      </div>
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">对话框</span></div>
+        <div class="row">
+          <div class="lab"><span>气泡类型</span></div>
+          <div class="bub-types">
+            <span class="chip chip-on">对话</span>
+            <span class="chip">思考</span>
+            <span class="chip">旁白</span>
+            <span class="chip">呼喊</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="lab"><span>字号</span><b>12 px</b></div>
+          <input type="range" min="9" max="20" step="1" value="12" aria-label="气泡字号">
+        </div>
+        <div class="row">
+          <div class="lab"><span>字体</span></div>
+          <div class="bub-types">
+            <span class="chip chip-on">黑体</span>
+            <span class="chip">手写体</span>
+            <span class="chip">宋体</span>
+          </div>
+        </div>
+        <div class="switchrow">
+          <span class="lab">气泡自动避让角色<small>不遮挡关键人物面部</small></span>
+          <span class="switch" role="switch" aria-checked="true"></span>
+        </div>
+        <div class="switchrow">
+          <span class="lab">台词来自分镜<small>改动会同步回分镜脚本</small></span>
+          <span class="switch" role="switch" aria-checked="true"></span>
+        </div>
+      </div>
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">拟声词</span></div>
+        <div class="bub-types">
+          <span class="chip">咔哒</span>
+          <span class="chip">哐当</span>
+          <span class="chip">滴——</span>
+          <button class="btn btn-ghost btn-sm" style="height:24px;padding:0 8px">+ 添加</button>
+        </div>
+      </div>
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">导出</span></div>
+        <div class="exp-opts">
+          <div class="exp on">
+            <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg></div>
+            <div class="t">PDF</div><div class="d">印刷级 · 单页翻阅</div>
+          </div>
+          <div class="exp">
+            <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h5"/></svg></div>
+            <div class="t">长图</div><div class="d">竖版拼接 · 一图到底</div>
+          </div>
+        </div>
+        <div class="exp-rows">
+          <div class="exp-row"><span class="k">分辨率</span><span class="v">300 DPI</span></div>
+          <div class="exp-row"><span class="k">页数</span><span class="v">8 页</span></div>
+          <div class="exp-row"><span class="k">出血边距</span><span class="v">3 mm</span></div>
+          <div class="exp-row"><span class="k">水印</span>
+            <span class="switch off" role="switch" aria-checked="false" style="transform:scale(.8)"></span>
+          </div>
+        </div>
+        <button class="btn btn-primary export-btn">导出 PDF（8 页）</button>
+      </div>
+
+    </aside>
+
+  </div>
+</main>
+</body>
+</html>

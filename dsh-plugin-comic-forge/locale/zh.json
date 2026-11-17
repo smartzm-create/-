@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "漫画工作台",
+    "description": "侧栏里的漫画生产流水线：故事大纲、人物设定卡、分镜脚本、保持角色一致性的批量生图、贴对话框的排版，以及 PDF / 长图导出。",
+    "detail": "docs/DETAIL.md"
+  },
+  "panel": "漫画台",
+  "project": {
+    "title": "《夜行电车》第 1 话",
+    "subtitle": "都市怪谈 · 24 格 · 预计 8 页 · 最近保存 2 分钟前"
+  },
+  "action": {
+    "history": "生成记录",
+    "continue": "继续制作",
+    "fix": "去处理"
+  },
+  "stage": {
+    "outline": "故事大纲",
+    "characters": "人物设定",
+    "storyboard": "分镜脚本",
+    "render": "批量生图",
+    "layout": "排版台词",
+    "export": "导出"
+  },
+  "meta": {
+    "outline": "3 幕 · 1200 字",
+    "characters": "3 个角色 · 已锁定",
+    "storyboard": "24 格 · 31 句台词",
+    "render": "18 / 24 已生成",
+    "export": "PDF / 长图"
+  },
+  "state": {
+    "done": "已完成",
+    "doing": "进行中",
+    "todo": "待开始",
+    "locked": "已锁定"
+  },
+  "chip": {
+    "logline": "1 句 logline",
+    "acts": "3 幕结构",
+    "lockOn": "角色锁 开",
+    "turnaround": "三视图 3 套",
+    "boardFields": "格子 · 台词 · 镜头",
+    "pages": "8 页",
+    "templates": "2 套布局模板",
+    "formats": "PDF / 长图 / 分页",
+    "dpi": "300 DPI",
+    "consistency": "一致性 0.80"
+  },
+  "q": {
+    "done": "已完成",
+    "rendering": "生成中",
+    "drift": "角色漂移",
+    "queued": "排队中"
+  },
+  "side": {
+    "consistency": "角色一致性",
+    "engine": "生成引擎"
+  },
+  "char": {
+    "lock": "角色锁",
+    "lin": "林晚",
+    "lin.role": "主角 · 列车员",
+    "shen": "沈默",
+    "shen.role": "神秘乘客",
+    "zhou": "老周",
+    "zhou.role": "电车司机"
+  },
+  "engine": {
+    "imagegen": "dsh-image-gen",
+    "comfyui": "ComfyUI"
+  },
+  "style": {
+    "mono": "黑白网屏"
+  },
+  "next": {
+    "eyebrow": "下一步",
+    "body": "格子 19 检测到角色漂移（林晚发色偏移），建议提高一致性强度后重试该格。"
+  }
+}

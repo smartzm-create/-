@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>方案A · 项目卡片 + 下钻</title>
+<style>
+  :root{
+    --bg:#ffffff; --side:#f9fafb; --card:#ffffff; --fg:#0f1115; --muted:#6b6f76;
+    --line:rgba(0,0,0,.12); --hover:#ebeef2; --accent:#4176e6; --btn:#0f1115; --btnfg:#fff;
+    --r-sm:8px; --r-md:12px; --r-lg:16px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:400 14px/1.5 var(--font);display:flex;height:100vh}
+  /* 侧栏（示意） */
+  .side{width:220px;background:var(--side);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex:none}
+  .side .brand{font-weight:700;font-size:15px;margin-bottom:12px}
+  .side .row{height:36px;border-radius:var(--r-md);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted);font-size:14px}
+  .side .row.on{background:var(--hover);color:var(--fg)}
+  .side .sec{margin-top:14px;font-size:12px;color:var(--muted);padding:0 12px}
+  /* 主区 */
+  .main{flex:1;overflow:auto;padding:28px 32px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .head h1{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .head .sub{color:var(--muted);font-size:13px}
+  .btn{height:32px;padding:0 14px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--fg);font:500 13px/1 var(--font);cursor:pointer}
+  .btn.pri{background:var(--btn);color:var(--btnfg);border-color:transparent}
+  .spacer{flex:1}
+  /* 项目网格 */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .pcard{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--card);padding:18px;display:flex;flex-direction:column;gap:14px;cursor:pointer;transition:box-shadow .15s}
+  .pcard:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+  .pc-top{display:flex;align-items:flex-start;gap:12px}
+  .cover{width:44px;height:44px;border-radius:var(--r-md);flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff}
+  .pc-name{font-size:15px;font-weight:600}
+  .pc-desc{font-size:12px;color:var(--muted)}
+  .pc-stats{display:flex;gap:18px;font-size:12px;color:var(--muted)}
+  .pc-stats b{display:block;font-size:18px;font-weight:600;color:var(--fg);letter-spacing:-.02em}
+  /* 进度环 */
+  .ring{margin-left:auto;position:relative;width:56px;height:56px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+  /* 6 阶段点 */
+  .stages{display:flex;gap:6px;align-items:center}
+  .stages .lab{font-size:11px;color:var(--muted);margin-right:2px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--hover)}
+  .dot.done{background:var(--btn)}
+  .dot.doing{background:var(--accent);box-shadow:0 0 0 3px rgba(65,118,230,.18)}
+  .dot-line{flex:1;height:2px;background:var(--line);margin:0 -2px}
+  .dot-line.done{background:var(--btn)}
+  .next{margin-top:24px;display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:var(--r-lg);background:var(--btn);color:var(--btnfg)}
+  .next .eb{font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+  .next .tx{font-size:13px}
+  .next .btn{margin-left:auto;background:var(--btnfg);color:var(--btn)}
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="brand">漫画工作台</div>
+    <div class="row on">项目</div>
+    <div class="row">模板库</div>
+    <div class="row">回收站</div>
+    <div class="sec">最近</div>
+    <div class="row">夜行电车</div>
+    <div class="row">山海食堂</div>
+  </aside>
+  <main class="main">
+    <div class="head">
+      <div>
+        <h1>我的项目</h1>
+        <div class="sub">3 个项目 · 点开一个看它的制作流水线</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn">导入</button>
+      <button class="btn pri">＋ 新建项目</button>
+    </div>
+
+    <div class="grid">
+      <!-- 项目 1 -->
+      <div class="pcard">
+        <div class="pc-top">
+          <div class="cover" style="background:#3b4a66">夜</div>
+          <div>
+            <div class="pc-name">夜行电车</div>
+            <div class="pc-desc">都市怪谈 · 连载</div>
+          </div>
+          <div class="ring">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="24" fill="none" stroke="var(--hover)" stroke-width="5"/><circle cx="28" cy="28" r="24" fill="none" stroke="var(--accent)" stroke-width="5" stroke-dasharray="113" stroke-dashoffset="28" stroke-linecap="round"/></svg>
+            <div class="pct">75%</div>
+          </div>
+        </div>
+        <div class="pc-stats">
+          <div><b>4</b>子任务</div><div><b>8</b>页</div><div><b>1</b>待处理</div>
+        </div>
+        <div class="stages">
+          <span class="lab">流水线</span>
+          <span class="dot done"></span><span class="dot-line done"></span>
+          <span class="dot done"></span><span class="dot-line done"></span>
+          <span class="dot done"></span><span class="dot-line done"></span>
+          <span class="dot doing"></span><span class="dot-line"></span>
+          <span class="dot"></span><span class="dot-line"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+
+      <!-- 项目 2 -->
+      <div class="pcard">
+        <div class="pc-top">
+          <div class="cover" style="background:#7a5c3e">山</div>
+          <div>
+            <div class="pc-name">山海食堂</div>
+            <div class="pc-desc">治愈日常 · 短篇</div>
+          </div>
+          <div class="ring">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="24" fill="none" stroke="var(--hover)" stroke-width="5"/><circle cx="28" cy="28" r="24" fill="none" stroke="var(--accent)" stroke-width="5" stroke-dasharray="113" stroke-dashoffset="85" stroke-linecap="round"/></svg>
+            <div class="pct">25%</div>
+          </div>
+        </div>
+        <div class="pc-stats">
+          <div><b>3</b>子任务</div><div><b>4</b>页</div><div><b>2</b>待处理</div>
+        </div>
+        <div class="stages">
+          <span class="lab">流水线</span>
+          <span class="dot done"></span><span class="dot-line done"></span>
+          <span class="dot doing"></span><span class="dot-line"></span>
+          <span class="dot"></span><span class="dot-line"></span>
+          <span class="dot"></span><span class="dot-line"></span>
+          <span class="dot"></span><span class="dot-line"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+
+      <!-- 新建 -->
+      <div class="pcard" style="border-style:dashed;align-items:center;justify-content:center;color:var(--muted);min-height:180px">
+        <div style="font-size:28px;line-height:1">＋</div>
+        <div style="font-size:14px;font-weight:500">新建项目</div>
+        <div style="font-size:12px">从一个点子开始</div>
+      </div>
+    </div>
+
+    <div class="next">
+      <div class="tx">
+        <div class="eb">继续上次的</div>
+        夜行电车 · 第 1 话 · 卡在「批量生图」第 19 格（角色漂移）
+      </div>
+      <button class="btn">接着做</button>
+    </div>
+  </main>
+</body>
+</html>

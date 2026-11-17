@@ -1,0 +1,17 @@
+{
+  "project": "夜行电车",
+  "episode": "第 1 话 · 末班车",
+  "genre": "都市怪谈 · 连载",
+  "format": { "panels": 24, "pages": 8, "dpi": 300 },
+  "stages": {
+    "outline": { "state": "done", "progress": 100 },
+    "characters": { "state": "done", "progress": 100 },
+    "storyboard": { "state": "done", "progress": 100 },
+    "render": { "state": "doing", "progress": 75, "note": "18 / 24 已生成；格子 19 检测到角色漂移（林晚发色偏移）" },
+    "layout": { "state": "todo", "progress": 0 },
+    "export": { "state": "todo", "progress": 0 }
+  },
+  "overall": 62,
+  "counts": { "panelsDone": 18, "panelsTotal": 24, "issues": 1 },
+  "engine": { "imagegen": "dsh-image-gen", "consistency": 0.8, "style": "黑白网屏" }
+}

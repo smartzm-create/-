@@ -1,0 +1,41 @@
+{
+  "locked": true,
+  "note": "角色锁已开启：批量生图时按各角色 AI 固定描述词保持一致性（consistency 0.80）。",
+  "characters": [
+    {
+      "id": "xiao",
+      "name": "肖晏",
+      "role": "受 · 半蛇兽人学霸",
+      "tags": "179cm / 冷白皮 / 清隽 / 年级第一 / 温柔腹黑 / 底线坚硬",
+      "look": "鹅蛋脸，五官清隽，冷白皮，黑色柔软中长发刘海微遮额，银边细框眼镜，偏瘦，洗得发白的浅灰卫衣或白衬衫（领口扣到顶），旧双肩包，书卷气、神情内敛温柔。",
+      "keys": "Chinese young man, oval face, delicate features, cool fair skin, soft black medium hair, silver thin-frame glasses, slim, faded light-gray hoodie, bookish, gentle reserved",
+      "beast": "半蛇兽人：情绪剧烈波动或易感期时瞳孔泛细碎竖瞳、耳后浮现淡青蛇鳞纹；本体冷翠色蛇，畏寒，本能渴求体温安抚。平时用药剂压制特征。"
+    },
+    {
+      "id": "xia",
+      "name": "夏琦",
+      "role": "攻 · 龙族兽人 · 羽毛球校队主力",
+      "tags": "192cm / 阳光开朗 / 外热内冷 / 护短 / 富家少爷",
+      "look": "轮廓分明的下颌，剑眉星目（眼型偏长，笑起来弯成弧），白皮肤，短碎黑蓝色头发发梢微翘，高大运动型肩宽背挺，掌心薄茧，白色衬衣＋深黑西装裤，简单贵气，笑起来露一口白牙。",
+      "keys": "Chinese young man, defined jaw, heroic brows, fair skin, short tousled blue-black hair, tall athletic 192cm, broad shoulders, white shirt, black trousers, sunny bright smile, noble air",
+      "beast": "龙族兽人：体温恒定偏高（比人类高1~1.5℃），情绪激动或保护欲被激发时瞳孔竖成金色竖瞳、眼尾浮现金色鳞纹，气息带极淡硝烟与灼热。"
+    },
+    {
+      "id": "zhou",
+      "name": "周明明",
+      "role": "反派 · 临时班长",
+      "tags": "心胸狭隘 / 嫉妒心强 / 虚伪做作 / 滥用职权 / 欺软怕硬",
+      "look": "中等身材约175cm偏瘦，肤色偏淡黄，红色短发整齐偏分发胶固定，黑框方形眼镜，狭长眼睛眼神阴鸷，皮笑肉不笑，蓝色衬衫扎进裤腰，胸前别「临时班长」胸牌。",
+      "keys": "Chinese young man, medium slim build, pale sallow skin, red short hair with side part and gel, black square glasses, narrow sly eyes, fake smile, blue shirt, temporary class-monitor badge, oily insincere"
+    },
+    {
+      "id": "yueyue",
+      "name": "夏玥玥",
+      "role": "配角 · 夏琦亲妹妹",
+      "tags": "高一少女 / 活泼跳脱小叛逆 / 心思通透 / 助攻",
+      "look": "十五岁，齐腰柔顺蓝黑长发平刘海常扎高马尾，圆圆杏眼眼尾微挑略带英气，冷白皮脸颊浅浅婴儿肥，笑起来露小虎牙，165cm匀称偏瘦，米白宽松针织开衫内搭浅蓝衬衫、深灰百褶裙、白色中筒袜、帆布包。",
+      "keys": "Chinese girl, fifteen, long blue-black hair in high ponytail, round apricot eyes, fair skin, baby-fat cheeks, small tiger tooth smile, cream knit cardigan, blue shirt, gray pleated skirt, canvas bag, lively spirited",
+      "beast": "龙族兽人幼体：情绪波动时瞳孔隐约泛淡金色、眼尾鳞纹尚浅，体温偏高、暖烘烘。"
+    }
+  ]
+}

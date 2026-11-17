@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>方案C · 横向流程板</title>
+<style>
+  :root{
+    --bg:#f9fafb; --card:#ffffff; --fg:#0f1115; --muted:#6b6f76;
+    --line:rgba(0,0,0,.12); --hover:#ebeef2; --accent:#4176e6; --btn:#0f1115; --btnfg:#fff;
+    --r-sm:8px; --r-md:12px; --r-lg:16px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:400 14px/1.5 var(--font);display:flex;height:100vh}
+  .side{width:200px;background:var(--card);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex:none}
+  .side .brand{font-weight:700;font-size:15px;margin-bottom:12px}
+  .side .row{height:36px;border-radius:var(--r-md);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted)}
+  .side .row.on{background:var(--hover);color:var(--fg)}
+  .main{flex:1;overflow:auto;padding:24px 28px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .head h1{font-size:18px;font-weight:600}
+  .proj{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13px;cursor:pointer}
+  .proj .cv{width:18px;height:18px;border-radius:5px;background:#3b4a66;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px}
+  .head .spacer{flex:1}
+  .lead{color:var(--muted);font-size:13px;margin-bottom:20px}
+  /* 横向流程 */
+  .board{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:start}
+  .col{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:10px;min-height:280px}
+  .col.doing{border-color:var(--accent)}
+  .col-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .col-h .n{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:var(--hover);color:var(--muted);flex:none}
+  .col.done .col-h .n{background:var(--btn);color:var(--btnfg)}
+  .col.doing .col-h .n{background:var(--accent);color:#fff}
+  .col-h .nm{font-size:13px;font-weight:600}
+  .col.doing .col-h .nm{color:var(--accent)}
+  .col-h .ct{margin-left:auto;font-size:11px;color:var(--muted)}
+  .tcard{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);padding:8px 9px;margin-bottom:8px;font-size:12px}
+  .tcard .tt{font-weight:500;margin-bottom:3px}
+  .tcard .tm{font-size:11px;color:var(--muted)}
+  .tcard.warn{border-color:#e0b4ad;background:#fdf3f1}
+  .tcard.warn .tm{color:#b4372a}
+  .tcard.add{border-style:dashed;color:var(--muted);text-align:center;background:transparent;cursor:pointer}
+  .arrow{align-self:center;color:var(--muted);font-size:16px;text-align:center}
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="brand">漫画工作台</div>
+    <div class="row on">流程板</div>
+    <div class="row">项目</div>
+    <div class="row">模板库</div>
+  </aside>
+  <main class="main">
+    <div class="head">
+      <div class="proj"><span class="cv">夜</span>夜行电车 ▾</div>
+      <h1>第 1 话 · 末班车</h1>
+      <div class="spacer"></div>
+      <div class="proj">切换子任务 ▾</div>
+    </div>
+    <div class="lead">一条流水线从左流到右 · 每个格子里是这步的活 · 点卡片进去做</div>
+
+    <div class="board">
+      <div class="col done">
+        <div class="col-h"><span class="n">✓</span><span class="nm">故事大纲</span><span class="ct">1</span></div>
+        <div class="tcard"><div class="tt">第 1 话大纲</div><div class="tm">3 幕 · 完成</div></div>
+      </div>
+      <div class="col done">
+        <div class="col-h"><span class="n">✓</span><span class="nm">人物设定</span><span class="ct">3</span></div>
+        <div class="tcard"><div class="tt">林晚</div><div class="tm">主角 · 已锁定</div></div>
+        <div class="tcard"><div class="tt">沈默</div><div class="tm">已锁定</div></div>
+        <div class="tcard"><div class="tt">老周</div><div class="tm">已锁定</div></div>
+      </div>
+      <div class="col done">
+        <div class="col-h"><span class="n">✓</span><span class="nm">分镜脚本</span><span class="ct">24</span></div>
+        <div class="tcard"><div class="tt">第 1–24 格</div><div class="tm">台词 31 句</div></div>
+      </div>
+      <div class="col doing">
+        <div class="col-h"><span class="n">4</span><span class="nm">批量生图</span><span class="ct">18/24</span></div>
+        <div class="tcard"><div class="tt">格子 01–16</div><div class="tm">已完成</div></div>
+        <div class="tcard"><div class="tt">格子 17–18</div><div class="tm">生成中</div></div>
+        <div class="tcard warn"><div class="tt">格子 19</div><div class="tm">角色漂移 · 重试</div></div>
+        <div class="tcard add">＋ 排队 20–24</div>
+      </div>
+      <div class="col">
+        <div class="col-h"><span class="n">5</span><span class="nm">排版台词</span><span class="ct">0</span></div>
+        <div class="tcard add">＋ 等生图完成</div>
+      </div>
+      <div class="col">
+        <div class="col-h"><span class="n">6</span><span class="nm">导出</span><span class="ct">0</span></div>
+        <div class="tcard add">＋ PDF / 长图</div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

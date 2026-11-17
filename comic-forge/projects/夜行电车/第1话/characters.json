@@ -1,0 +1,36 @@
+{
+  "locked": true,
+  "note": "角色锁已开启：批量生图时按此设定的外貌关键词保持一致性（consistency 0.80）。",
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林晚",
+      "role": "主角 · 夜班列车员",
+      "age": "24 岁左右",
+      "appearance": "齐肩黑发，利落扎起；深蓝色列车员制服，肩章，左胸一枚旧铜质徽章；身形清瘦，站姿笔直。",
+      "personality": "冷静、守规矩、观察力强；不善言辞但责任心重。",
+      "keys": ["black shoulder-length hair", "dark blue conductor uniform", "brass badge", "slim, upright posture"],
+      "turnaround": "正面 / 侧面 / 背面 三视图（待生成）"
+    },
+    {
+      "id": "shen",
+      "name": "沈默",
+      "role": "神秘乘客",
+      "age": "不明，看似 30 上下",
+      "appearance": "灰色长大衣，围深色围巾，半张脸常隐在阴影里；手里握着一张旧车票；眼神疲惫而温和。",
+      "personality": "寡言、礼貌、带着挥之不去的倦意；像是在等一个了很久的终点。",
+      "keys": ["long gray coat", "dark scarf", "holding an old ticket", "half face in shadow", "tired gentle eyes"],
+      "turnaround": "正面 / 侧面 / 背面 三视图（待生成）"
+    },
+    {
+      "id": "zhou",
+      "name": "老周",
+      "role": "电车司机",
+      "age": "55 岁上下",
+      "appearance": "花白短发，深色司机制服，袖口磨损；手掌粗糙，指间夹一支未点燃的烟；后视镜般锐利的眼神。",
+      "personality": "沉默寡言、见多识广；知道这趟车的秘密，选择不多说。",
+      "keys": ["gray short hair", "dark driver uniform", "worn cuffs", "unlit cigarette", "sharp watchful eyes"],
+      "turnaround": "正面 / 侧面 / 背面 三视图（待生成）"
+    }
+  ]
+}

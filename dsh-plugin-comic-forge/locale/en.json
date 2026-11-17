@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Comic workbench",
+    "description": "A comic production pipeline in your sidebar: story outline, character sheets, storyboard, batch image generation with character consistency, panel layout with speech bubbles, and PDF / long-strip export.",
+    "detail": "docs/DETAIL.md"
+  },
+  "panel": "Comics",
+  "project": {
+    "title": "Night Train, Ep. 1",
+    "subtitle": "Urban fantasy · 24 panels · about 8 pages · saved 2 min ago"
+  },
+  "action": {
+    "history": "History",
+    "continue": "Continue",
+    "fix": "Fix"
+  },
+  "stage": {
+    "outline": "Outline",
+    "characters": "Characters",
+    "storyboard": "Storyboard",
+    "render": "Batch render",
+    "layout": "Layout",
+    "export": "Export"
+  },
+  "meta": {
+    "outline": "3 acts · 1200 words",
+    "characters": "3 characters · locked",
+    "storyboard": "24 panels · 31 lines",
+    "render": "18 / 24 rendered",
+    "export": "PDF / long strip"
+  },
+  "state": {
+    "done": "Done",
+    "doing": "In progress",
+    "todo": "Not started",
+    "locked": "Locked"
+  },
+  "chip": {
+    "logline": "1 logline",
+    "acts": "3 acts",
+    "lockOn": "Character lock on",
+    "turnaround": "3 turnarounds",
+    "boardFields": "Panels · dialogue · camera",
+    "pages": "8 pages",
+    "templates": "2 layout templates",
+    "formats": "PDF / long strip / per-page",
+    "dpi": "300 DPI",
+    "consistency": "Consistency 0.80"
+  },
+  "q": {
+    "done": "done",
+    "rendering": "rendering",
+    "drift": "character drift",
+    "queued": "queued"
+  },
+  "side": {
+    "consistency": "Character consistency",
+    "engine": "Render engine"
+  },
+  "char": {
+    "lock": "Character lock",
+    "lin": "Lin Wan",
+    "lin.role": "Lead · conductor",
+    "shen": "Shen Mo",
+    "shen.role": "Mysterious passenger",
+    "zhou": "Lao Zhou",
+    "zhou.role": "Train driver"
+  },
+  "engine": {
+    "imagegen": "dsh-image-gen",
+    "comfyui": "ComfyUI"
+  },
+  "style": {
+    "mono": "B&W screentone"
+  },
+  "next": {
+    "eyebrow": "Next up",
+    "body": "Panel 19 shows character drift (Lin Wan's hair color shifted). Raise consistency strength and retry that panel."
+  }
+}

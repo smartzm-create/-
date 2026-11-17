@@ -1,0 +1,4 @@
+- insert:
+    - id: comic-forge
+      name: '@local/comic-forge'
+      config: {}

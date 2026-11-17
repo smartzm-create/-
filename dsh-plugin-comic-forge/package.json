@@ -1,0 +1,31 @@
+{
+  "name": "@local/comic-forge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Comic workbench: outline to characters, storyboard, batch image generation, layout and export.",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./data": "./data.cjs",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "data.cjs",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
+    }
+  }
+}

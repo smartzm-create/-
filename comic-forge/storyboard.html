@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>分镜与生图 · 漫画工作台</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .wrap{max-width:1320px;margin:0 auto;padding:var(--sp-6) var(--sp-6) var(--sp-16)}
+
+  /* 子页头 */
+  .subhead{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-5);flex-wrap:wrap}
+  .back{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-13);color:var(--muted);min-height:28px;padding:0 4px}
+  .back:hover{color:var(--text)}
+  .subhead h1{margin:0;font-size:var(--fs-24);font-weight:600;letter-spacing:-.02em}
+  .subhead .badge{margin-left:auto}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:var(--sp-5);align-items:start}
+
+  /* 分镜网格 */
+  .grid-toolbar{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-4);flex-wrap:wrap}
+  .grid-toolbar .count{font-size:var(--fs-13);color:var(--muted)}
+  .panels{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-4)}
+
+  .panel{overflow:hidden;display:flex;flex-direction:column}
+  .panel.fail{border-color:#F3C9C9}
+  /* 画面 */
+  .shot{position:relative;aspect-ratio:4/3;background:#E7ECF5;overflow:hidden}
+  .shot svg{width:100%;height:100%;display:block}
+  .shot .cam{
+    position:absolute;left:8px;top:8px;
+    background:rgba(24,24,27,.7);color:#fff;font-size:var(--fs-12);
+    padding:2px 7px;border-radius:var(--radius-full);font-weight:500;
+  }
+  .shot .num{
+    position:absolute;right:8px;top:8px;
+    background:rgba(255,255,255,.92);color:var(--text);font-size:var(--fs-12);font-weight:600;
+    padding:2px 7px;border-radius:var(--radius-full);
+  }
+  .shot .state-tag{
+    position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,.94);border-radius:var(--radius-full);
+    padding:3px 8px;font-size:var(--fs-12);font-weight:500;
+  }
+  .shot .state-tag.doing{color:var(--accent)}
+  .shot .state-tag.fail{color:var(--danger)}
+  .shot .state-tag.wait{color:var(--muted)}
+  .shot .state-tag.ok{color:var(--ok)}
+  /* 生成中扫描 */
+  .scan{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(37,99,235,.10) 50%,transparent 60%);animation:scan 1.6s linear infinite}
+  @keyframes scan{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+  .shot.waiting{background:repeating-linear-gradient(45deg,#F1F1F3,#F1F1F3 10px,#EAEAEc 10px,#EAEAEc 20px)}
+
+  .panel-body{padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2);flex:1}
+  .camline{font-size:var(--fs-12);color:var(--muted);display:flex;gap:6px;align-items:center}
+  .camline .k{color:var(--muted)}
+  .desc{font-size:var(--fs-13);line-height:1.55;color:var(--text)}
+  .dialogue{
+    font-size:var(--fs-13);line-height:1.5;
+    border-left:2px solid var(--line-strong);padding-left:var(--sp-3);color:var(--text);
+  }
+  .dialogue .who{font-weight:600;color:var(--muted);margin-right:6px;font-size:var(--fs-12)}
+  .dialogue.narr{border-left-color:var(--accent);font-style:normal;color:var(--muted)}
+  .panel-foot{padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--line);display:flex;gap:var(--sp-2);align-items:center}
+  .panel-foot .retry{margin-left:auto;color:var(--danger);font-size:var(--fs-12);font-weight:500;display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 2px}
+  .panel-foot .regen{color:var(--muted);font-size:var(--fs-12);display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 2px}
+  .panel-foot a:hover{text-decoration:underline}
+
+  /* 右侧控制台 */
+  .console{position:sticky;top:76px;display:flex;flex-direction:column;gap:var(--sp-4)}
+  .con-block{padding:var(--sp-5)}
+  .con-block + .con-block{margin-top:0}
+  .con-title{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-4)}
+  .con-title .section-title{font-size:var(--fs-14);font-weight:600}
+  .con-title .badge{margin-left:auto}
+
+  /* 开关 */
+  .switchrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-2) 0}
+  .switchrow .lab{font-size:var(--fs-13)}
+  .switchrow .lab small{display:block;color:var(--muted);font-size:var(--fs-12);font-weight:400}
+  .switch{position:relative;width:38px;height:22px;border-radius:var(--radius-full);background:var(--primary);flex-shrink:0;transition:background var(--dur) var(--ease)}
+  .switch::after{content:"";position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left var(--dur) var(--ease)}
+  .switch.off{background:var(--line-strong)}
+  .switch.off::after{left:3px}
+
+  /* 参考图 */
+  .refs{display:flex;gap:var(--sp-2);margin:var(--sp-2) 0 var(--sp-3)}
+  .ref{position:relative;width:64px;height:64px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--line);flex-shrink:0}
+  .ref svg{width:100%;height:100%}
+  .ref .lock{position:absolute;right:3px;bottom:3px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--accent)}
+  .ref .nm{position:absolute;left:0;right:0;bottom:0;background:rgba(24,24,27,.7);color:#fff;font-size:var(--fs-12);text-align:center;padding:0;line-height:16px}
+
+  /* 滑块 */
+  .slider-row{padding:var(--sp-2) 0}
+  .slider-row .top{display:flex;justify-content:space-between;font-size:var(--fs-12);color:var(--muted);margin-bottom:var(--sp-1)}
+  .slider-row .top b{color:var(--text);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:24px}
+
+  .style-chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+
+  /* 模型行 */
+  .model-row{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3);background:var(--surface-2);border-radius:var(--radius);font-size:var(--fs-12);margin-top:var(--sp-3)}
+  .model-row .mono{font-family:var(--font-mono);color:var(--text)}
+
+  /* prompt 模板 */
+  .prompt{
+    font-family:var(--font-mono);font-size:var(--fs-12);line-height:1.6;color:var(--muted);
+    background:var(--surface-2);border-radius:var(--radius);padding:var(--sp-3);
+    white-space:pre-wrap;word-break:break-word;max-height:180px;overflow:auto;margin-top:var(--sp-3);
+  }
+  .prompt b{color:var(--accent);font-weight:500}
+
+  /* 队列统计 */
+  .queue-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-2);margin-bottom:var(--sp-3)}
+  .qs{background:var(--surface-2);border-radius:var(--radius);padding:var(--sp-3);text-align:center}
+  .qs .v{font-size:var(--fs-20);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+  .qs .k{font-size:var(--fs-12);color:var(--muted)}
+  .qs.ok .v{color:var(--ok)}
+  .qs.doing .v{color:var(--accent)}
+  .qs.fail .v{color:var(--danger)}
+  .console-actions{display:flex;flex-direction:column;gap:var(--sp-2)}
+  .console-actions .btn{justify-content:center}
+
+  @media (max-width:1080px){
+    .layout{grid-template-columns:1fr}
+    .console{position:static}
+  }
+  @media (max-width:640px){
+    .panels{grid-template-columns:1fr}
+    .wrap{padding:var(--sp-5) var(--sp-4) var(--sp-12)}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">漫</span>漫画工作台</div>
+  <a href="pipeline.html" class="project-pill"><span class="dot"></span>《夜行电车》第 1 话</a>
+  <div class="topbar-spacer"></div>
+  <button class="btn btn-ghost btn-sm">生成记录</button>
+  <a href="layout.html" class="btn btn-primary btn-sm">去排版 →</a>
+</header>
+
+<main class="wrap">
+
+  <div class="subhead">
+    <a href="pipeline.html" class="back">← 流水线</a>
+    <h1>分镜 &amp; 批量生图</h1>
+    <span class="badge badge-doing"><span class="dot"></span>阶段 4 · 进行中 18/24</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- 左：分镜格子 -->
+    <section>
+      <div class="grid-toolbar">
+        <span class="count">显示 24 格中的 16–21</span>
+        <span class="chip chip-on">全部</span>
+        <span class="chip">仅失败</span>
+        <span class="chip">仅未生成</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto">批量导入分镜</button>
+      </div>
+
+      <div class="panels">
+
+        <!-- 格 16 -->
+        <article class="card panel">
+          <div class="shot">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="g16" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B4A66"/><stop offset="1" stop-color="#7C8AA6"/></linearGradient></defs>
+              <rect width="400" height="300" fill="url(#g16)"/>
+              <rect x="0" y="210" width="400" height="90" fill="#2A3245"/>
+              <rect x="120" y="70" width="160" height="150" rx="8" fill="#1E2533" opacity=".55"/>
+              <rect x="130" y="80" width="140" height="40" rx="3" fill="#9DB0CF" opacity=".5"/>
+              <rect x="60" y="130" width="20" height="80" fill="#1E2533"/>
+              <circle cx="330" cy="60" r="18" fill="#C9D4E8" opacity=".4"/>
+            </svg>
+            <span class="cam">远景</span><span class="num">16</span>
+            <span class="state-tag ok">✓ 已生成</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>固定机位 · 车站全景 · 夜</div>
+            <div class="desc">末班电车缓缓驶入空无一人的站台，车灯扫过湿漉漉的地面。</div>
+            <div class="dialogue narr"><span class="who">旁白</span>23:47，末班车准点进站。</div>
+          </div>
+          <div class="panel-foot"><a href="#" class="regen">↻ 重新生成</a><span style="margin-left:auto;font-size:var(--fs-12);color:var(--muted)">seed 81273</span></div>
+        </article>
+
+        <!-- 格 17 -->
+        <article class="card panel">
+          <div class="shot">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="g17" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DDE4EF"/><stop offset="1" stop-color="#B6C1D3"/></linearGradient></defs>
+              <rect width="400" height="300" fill="url(#g17)"/>
+              <rect x="40" y="60" width="320" height="180" rx="6" fill="#C2CCDC"/>
+              <rect x="60" y="80" width="120" height="60" rx="3" fill="#EEF2F8"/>
+              <rect x="220" y="80" width="120" height="60" rx="3" fill="#EEF2F8"/>
+              <rect x="0" y="240" width="400" height="60" fill="#98A5BB"/>
+              <circle cx="200" cy="150" r="26" fill="#5B6B85"/>
+              <path d="M150 300c0-42 22-64 50-64s50 22 50 64z" fill="#5B6B85"/>
+              <rect x="176" y="120" width="48" height="8" rx="4" fill="#3D4960"/>
+            </svg>
+            <span class="cam">中景</span><span class="num">17</span>
+            <span class="state-tag ok">✓ 已生成</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>平视 · 车厢内 · 逆光</div>
+            <div class="desc">林晚在空荡的车厢里拖地，顶灯在湿地面拉出一道反光。</div>
+            <div class="dialogue"><span class="who">林晚</span>最后一趟了，收工。</div>
+          </div>
+          <div class="panel-foot"><a href="#" class="regen">↻ 重新生成</a><span style="margin-left:auto;font-size:var(--fs-12);color:var(--muted)">seed 81274</span></div>
+        </article>
+
+        <!-- 格 18 生成中 -->
+        <article class="card panel">
+          <div class="shot">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="g18" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C3446"/><stop offset="1" stop-color="#4C5872"/></linearGradient></defs>
+              <rect width="400" height="300" fill="url(#g18)"/>
+              <circle cx="200" cy="140" r="60" fill="none" stroke="#8FA0BD" stroke-width="2" opacity=".5"/>
+              <circle cx="230" cy="120" r="30" fill="#141924" opacity=".6"/>
+              <rect x="196" y="170" width="8" height="40" fill="#141924" opacity=".4"/>
+            </svg>
+            <div class="scan"></div>
+            <span class="cam">特写</span><span class="num">18</span>
+            <span class="state-tag doing">◐ 生成中 62%</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>特写 · 车窗倒影 · 浅景深</div>
+            <div class="desc">林晚抬起头，昏暗车窗的倒影里，身后多出一个人影。</div>
+            <div class="dialogue"><span class="who">林晚</span>……有人？</div>
+          </div>
+          <div class="panel-foot"><a href="#" class="regen">⏸ 暂停</a><span style="margin-left:auto;font-size:var(--fs-12);color:var(--muted)">一致性 0.8</span></div>
+        </article>
+
+        <!-- 格 19 失败 -->
+        <article class="card panel fail">
+          <div class="shot">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="g19" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7E3DA"/><stop offset="1" stop-color="#CFC8B8"/></linearGradient></defs>
+              <rect width="400" height="300" fill="url(#g19)"/>
+              <rect x="60" y="90" width="280" height="150" rx="6" fill="#D8D2C4"/>
+              <circle cx="260" cy="150" r="26" fill="#7A7263"/>
+              <path d="M210 300c0-44 22-66 50-66s50 22 50 66z" fill="#7A7263"/>
+              <rect x="234" y="120" width="52" height="10" rx="5" fill="#4A4438"/>
+            </svg>
+            <span class="cam">中景</span><span class="num">19</span>
+            <span class="state-tag fail">! 角色漂移</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>过肩 · 车厢尾部 · 暖灯</div>
+            <div class="desc">沈默独自坐在最后一排，身上是十年前的旧款列车员制服。</div>
+            <div class="dialogue"><span class="who">沈默</span>这一站，到了。</div>
+          </div>
+          <div class="panel-foot"><a href="#" class="retry">↻ 重试（发色偏移）</a></div>
+        </article>
+
+        <!-- 格 20 排队 -->
+        <article class="card panel">
+          <div class="shot waiting">
+            <span class="cam">特写</span><span class="num">20</span>
+            <span class="state-tag wait">· 排队中</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>特写 · 地面 · 快门 1/500</div>
+            <div class="desc">铁桶落地，拖把滚到过道中央，水渍在灯光下蔓延。</div>
+            <div class="dialogue narr"><span class="who">音效</span>哐当——</div>
+          </div>
+          <div class="panel-foot"><span style="font-size:var(--fs-12);color:var(--muted)">等待前序格完成</span></div>
+        </article>
+
+        <!-- 格 21 排队 -->
+        <article class="card panel">
+          <div class="shot waiting">
+            <span class="cam">远景</span><span class="num">21</span>
+            <span class="state-tag wait">· 排队中</span>
+          </div>
+          <div class="panel-body">
+            <div class="camline"><span class="k">镜头</span>远景 · 隧道 · 速度线</div>
+            <div class="desc">电车驶入隧道，灯光被拉成一条条向后飞逝的细线。</div>
+            <div class="dialogue narr"><span class="who">旁白</span>从这一站起，乘客只多不少。</div>
+          </div>
+          <div class="panel-foot"><span style="font-size:var(--fs-12);color:var(--muted)">等待前序格完成</span></div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 右：批量生图控制台 -->
+    <aside class="console">
+
+      <div class="card con-block">
+        <div class="con-title">
+          <span class="section-title">角色一致性</span>
+          <span class="badge badge-done"><span class="dot"></span>角色锁 开</span>
+        </div>
+        <div class="switchrow">
+          <span class="lab">角色锁<small>跨格固定五官 / 发型 / 服装</small></span>
+          <span class="switch" role="switch" aria-checked="true"></span>
+        </div>
+        <div class="refs">
+          <div class="ref">
+            <svg viewBox="0 0 64 64"><rect width="64" height="64" fill="#DBE5F6"/><circle cx="32" cy="26" r="12" fill="#93A9CE"/><path d="M10 64c0-13 10-20 22-20s22 7 22 20z" fill="#93A9CE"/></svg>
+            <span class="nm">林晚</span>
+            <span class="lock"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          </div>
+          <div class="ref">
+            <svg viewBox="0 0 64 64"><rect width="64" height="64" fill="#E4E4E7"/><circle cx="32" cy="26" r="12" fill="#A1A1AA"/><path d="M10 64c0-13 10-20 22-20s22 7 22 20z" fill="#A1A1AA"/></svg>
+            <span class="nm">沈默</span>
+            <span class="lock"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          </div>
+          <div class="ref">
+            <svg viewBox="0 0 64 64"><rect width="64" height="64" fill="#E7E2D6"/><circle cx="32" cy="26" r="12" fill="#B7AE97"/><path d="M10 64c0-13 10-20 22-20s22 7 22 20z" fill="#B7AE97"/></svg>
+            <span class="nm">老周</span>
+            <span class="lock"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          </div>
+        </div>
+        <div class="slider-row">
+          <div class="top"><span>一致性强度</span><b>0.80</b></div>
+          <input type="range" min="0" max="1" step="0.05" value="0.8" aria-label="一致性强度">
+          <div class="top" style="margin-top:2px"><span>自由</span><span>严格</span></div>
+        </div>
+        <div class="slider-row">
+          <div class="top"><span>角色漂移检测</span><b>开启</b></div>
+          <div style="font-size:var(--fs-12);color:var(--muted)">生成后自动比对参考图，超出阈值标记为「漂移」</div>
+        </div>
+      </div>
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">风格与提示词</span></div>
+        <div class="style-chips">
+          <span class="chip chip-on">黑白网屏</span>
+          <span class="chip">冷青夜色</span>
+          <span class="chip">做旧纸感</span>
+          <span class="chip">日式少线</span>
+        </div>
+        <div class="model-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg>
+          <span>引擎</span><span class="mono">dsh-image-gen → ComfyUI</span>
+        </div>
+        <div class="prompt"><b>[角色:林晚]</b> 列车员制服，齐肩黑发，神情疲惫
+<b>[镜头:特写]</b> 车窗倒影，浅景深
+<b>[风格]</b> 黑白网屏，冷调，高对比
+<b>[负面]</b> 多余手指，五官漂移，文字水印
+seed: 随机 · 每格独立</div>
+      </div>
+
+      <div class="card con-block">
+        <div class="con-title"><span class="section-title">生成队列</span></div>
+        <div class="queue-stats">
+          <div class="qs ok"><div class="v">16</div><div class="k">已完成</div></div>
+          <div class="qs doing"><div class="v">1</div><div class="k">生成中</div></div>
+          <div class="qs fail"><div class="v">1</div><div class="k">待重试</div></div>
+        </div>
+        <div class="console-actions">
+          <button class="btn btn-accent">重试失败格（1）</button>
+          <button class="btn btn-ghost">生成剩余排队（4）</button>
+          <button class="btn btn-ghost">全部重新生成</button>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</main>
+</body>
+</html>
